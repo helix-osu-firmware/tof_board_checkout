@@ -33,8 +33,6 @@ module board_checkout(
 		      input SPI_MISO,
 		      `endif
               //// ADD BOARD SPECIFIC STUFF HERE ////
-              output SDA_PUP,
-              output SCL_PUP,
               ////    END BOARD SPECIFIC STUFF   ////
 		      // Add blinky LED.
 		      // you always have to have at least ONE blinky LED		      
@@ -126,7 +124,7 @@ module board_checkout(
 	 board_i2c_checkout u_i2c(.clk(sysclk),.scl_i(scl_i),.scl_o(scl_o),.scl_t(scl_t),.sda_i(sda_i),.sda_o(sda_o),.sda_t(sda_t));
       end
       if (NUM_SPI_FLASH > 0) begin : SPI
-        board_spi_flash_checkout u_spi(.clk(sysclk),
+        board_spi_flash_checkout #(.NUM_SPI_FLASH(NUM_SPI_FLASH)) u_spi(.clk(sysclk),
                                        .sclk_o(SPI_SCLK),
                                        .mosi_o(SPI_MOSI),
                                        .miso_i(SPI_MISO),
