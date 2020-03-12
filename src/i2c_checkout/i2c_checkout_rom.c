@@ -4,6 +4,11 @@
 #include "soft_i2c_user.h"
 
 // only [7:5] are decoded
+#define EXECUTE 0x40
+#define RESULT 0x41
+#define NUMBYTES 0x42
+#define ADDRESS 0x43
+#define DATA 0x44
 #define LOOP_DONE 0x20
 
 void init() {
@@ -28,7 +33,29 @@ void init() {
 }
 
 void loop() {
-  // DO NOTHING
+  input( EXECUTE, &sSpare);
+  if (sSpare & 0x1) {    
+    input( NUMBYTES, &s0 );
+    s1 = ADDRESS;
+    // s0 holds number of bytes-1
+    // so add the buffer pointer+1
+    s0 += I2C_BUFFER(1);
+    // s0 is now pointer to the first byte
+    sA = s0;
+    // Loop and store.
+    do {
+      input(s1, &sSpare);
+      store(s0, sSpare);
+      s1++;
+      s0--;
+    } while(s0 != (I2C_BUFFER(-1)&0xFF));
+    I2C_write_bytes();
+    s0 = 2;
+    if (Z) {
+      s0 -= 1;
+    }
+    output( RESULT, s0 );
+  }
 }
 
 // Check if device passed in s1 exists.
